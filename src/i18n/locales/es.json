@@ -1,0 +1,145 @@
+{
+  "auth": {
+    "header": {
+      "signIn": "Iniciar sesión",
+      "register": "Registrarse",
+      "dontHaveAccount": "¿No tienes una cuenta?",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "rememberPassword": "¿Recuerdas tu contraseña?"
+    },
+    "hero": {
+      "title_line1": "Tu",
+      "title_line2": "transformación",
+      "title_line3": "comienza hoy",
+      "description": "Accede a tu plan de nutrición y rutina de entrenamiento personalizados para lograr tu mejor versión."
+    },
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Ingresa tus credenciales para acceder a tu panel.",
+      "identifier": "Correo, Usuario o Teléfono",
+      "identifierPlaceholder": "correo@ejemplo.com, usuario o +1234567890",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "keepLoggedIn": "Mantener sesión iniciada",
+      "submit": "Iniciar sesión"
+    },
+    "register": {
+      "title": "Crear Cuenta",
+      "subtitle": "Únete a FitPilot y comienza tu transformación hoy.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "submit": "Registrarse"
+    },
+    "registerLink": {
+      "verifying": "Verificando tu invitación...",
+      "invalidLink": "Enlace inválido",
+      "invalidLinkMessage": "Este enlace de invitación es inválido o ha expirado.",
+      "goToSignIn": "Ir a Iniciar Sesión",
+      "accountCreated": "¡Cuenta Creada!",
+      "successMessage": "Tu cuenta se ha configurado correctamente. Redirigiendo al inicio de sesión...",
+      "signInNow": "Iniciar Sesión Ahora",
+      "title": "Completar Registro",
+      "subtitle": "Configura tu perfil para acceder a tu cuenta.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "phoneNumber": "Número de teléfono",
+      "username": "Nombre de usuario",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "creatingAccount": "Creando Cuenta...",
+      "submit": "Completar Registro",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden",
+      "registrationFailed": "El registro falló",
+      "errorTitle": "Error de Invitación",
+      "backToLogin": "Volver a Iniciar Sesión",
+      "tokenNotFound": "Invitación no encontrada.",
+      "invalidToken": "Enlace de invitación inválido o expirado.",
+      "usernameTaken": "El nombre de usuario ya está en uso",
+      "usernameAvailable": "Nombre de usuario disponible"
+    },
+    "forgotPassword": {
+      "title": "Restablecer Contraseña",
+      "subtitle": "Ingresa tu correo para recibir un enlace de restablecimiento.",
+      "email": "Correo electrónico",
+      "submit": "Enviar Enlace",
+      "checkEmail": "Revisa tu correo para el enlace de restablecimiento."
+    },
+    "footer": {
+      "terms": "Términos de servicio",
+      "privacy": "Política de privacidad",
+      "support": "Soporte",
+      "copyright": "FitPilot App"
+    }
+  },
+  "onboarding": {
+    "step": "Paso {{current}} de {{total}}",
+    "exit": "Salir",
+    "back": "Atrás",
+    "next": "Siguiente Paso",
+    "complete": "Completar Registro",
+    "settingUp": "Configurando tu perfil...",
+    "settingUpDesc": "Por favor espera mientras personalizamos tu experiencia.",
+    "goals": {
+      "title": "¿Cuáles son tus objetivos?",
+      "subtitle": "Selecciona todos los que apliquen"
+    },
+    "allergens": {
+      "title": "¿Tienes alguna alergia o intolerancia?",
+      "subtitle": "Selecciona las que apliquen a ti",
+      "searchPlaceholder": "Buscar alergias...",
+      "noResults": "No se encontraron resultados para",
+      "allergiesSection": "Alergias",
+      "intolerancesSection": "Intolerancias"
+    },
+    "metrics": {
+      "title": "Medidas Actuales",
+      "subtitle": "Ayúdanos a personalizar tu plan",
+      "weight": "Peso (kg)",
+      "height": "Altura (cm)"
+    },
+    "preferences": {
+      "title": "Preferencias de Alimentos",
+      "subtitle": "Cuéntanos qué te gusta y qué evitar",
+      "likesLabel": "Alimentos que te gustan (Presiona Enter para agregar)",
+      "likesPlaceholder": "ej. Pollo, Arroz, Manzana",
+      "dislikesLabel": "Alimentos que no te gustan (Presiona Enter para agregar)",
+      "dislikesPlaceholder": "ej. Brócoli, Pescado",
+      "next": "Siguiente",
+      "back": "Atrás"
+    },
+    "medical": {
+      "title": "Detalles Médicos",
+      "subtitle": "Ayúdanos a entender tu historial de salud",
+      "conditionsLabel": "Condiciones Médicas",
+      "conditionsPlaceholder": "ej. Diabetes, Hipertensión...",
+      "surgeriesLabel": "Cirugías / Lesiones",
+      "surgeriesPlaceholder": "Agregar una cirugía o lesión",
+      "addSurgery": "Agregar",
+      "surgeryFields": {
+        "bodyPart": "Parte del cuerpo",
+        "bodyPartPlaceholder": "ej. Rodilla, Hombro",
+        "name": "Nombre de lesión/cirugía",
+        "namePlaceholder": "ej. Rotura de menisco",
+        "severity": "Severidad (1-5)",
+        "status": "Estado",
+        "statusPlaceholder": "Seleccionar estado",
+        "statusOptions": {
+          "active": "Activa",
+          "recovered": "Recuperada",
+          "chronic": "Crónica"
+        },
+        "limitations": "Limitaciones",
+        "limitationsPlaceholder": "ej. Evitar levantar peso",
+        "diagnosticDate": "Fecha Diagnóstico (Opcional)",
+        "recoveryDate": "Fecha Recuperación (Opcional)"
+      },
+      "notesLabel": "Notas Adicionales",
+      "notesPlaceholder": "Cualquier otro detalle que debamos saber...",
+      "complete": "Completar Registro",
+      "back": "Atrás"
+    }
+  }
+}

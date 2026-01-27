@@ -1,0 +1,145 @@
+{
+  "auth": {
+    "header": {
+      "signIn": "Sign in",
+      "register": "Register",
+      "dontHaveAccount": "Don't have an account?",
+      "alreadyHaveAccount": "Already have an account?",
+      "rememberPassword": "Remember your password?"
+    },
+    "hero": {
+      "title_line1": "Your",
+      "title_line2": "transformation",
+      "title_line3": "starts today",
+      "description": "Access your personalized nutrition plan and training routine to verify your best version."
+    },
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Enter your credentials to access your panel.",
+      "identifier": "Email, Username or Phone",
+      "identifierPlaceholder": "email@example.com, username or +1234567890",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot your password?",
+      "keepLoggedIn": "Keep me logged in",
+      "submit": "Sign In"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join FitPilot and start your transformation today.",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign up"
+    },
+    "registerLink": {
+      "verifying": "Verifying your invitation...",
+      "invalidLink": "Invalid Link",
+      "invalidLinkMessage": "This invitation link is invalid or has expired.",
+      "goToSignIn": "Go to Sign In",
+      "accountCreated": "Account Created!",
+      "successMessage": "Your account has been successfully set up. Redirecting you to login...",
+      "signInNow": "Sign In Now",
+      "title": "Complete Registration",
+      "subtitle": "Set up your profile to access your account.",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "phoneNumber": "Phone Number",
+      "username": "Username",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "creatingAccount": "Creating Account...",
+      "submit": "Complete Registration",
+      "passwordsDoNotMatch": "Passwords don't match",
+      "registrationFailed": "Registration failed",
+      "errorTitle": "Invitation Error",
+      "backToLogin": "Back to Sign In",
+      "tokenNotFound": "Invitation not found.",
+      "invalidToken": "Invalid or expired invitation link.",
+      "usernameTaken": "Username is already taken",
+      "usernameAvailable": "Username is available"
+    },
+    "forgotPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive a reset link.",
+      "email": "Email",
+      "submit": "Send Reset Link",
+      "checkEmail": "Check your email for the reset link."
+    },
+    "footer": {
+      "terms": "Terms of service",
+      "privacy": "Privacy policy",
+      "support": "Support",
+      "copyright": "FitPilot App"
+    }
+  },
+  "onboarding": {
+    "step": "Step {{current}} of {{total}}",
+    "exit": "Exit",
+    "back": "Back",
+    "next": "Next Step",
+    "complete": "Complete Setup",
+    "settingUp": "Setting up your profile...",
+    "settingUpDesc": "Please wait while we personalize your experience.",
+    "goals": {
+      "title": "Which are your goals?",
+      "subtitle": "Select all that apply to you"
+    },
+    "allergens": {
+      "title": "Do you have any allergies or intolerances?",
+      "subtitle": "Select all that apply to you",
+      "searchPlaceholder": "Search allergies...",
+      "noResults": "No results found for",
+      "allergiesSection": "Allergies",
+      "intolerancesSection": "Intolerances"
+    },
+    "metrics": {
+      "title": "Current Measurements",
+      "subtitle": "Help us personalize your plan",
+      "weight": "Weight (kg)",
+      "height": "Height (cm)"
+    },
+    "preferences": {
+      "title": "Food Preferences",
+      "subtitle": "Tell us what you love and what to avoid",
+      "likesLabel": "Foods you like (Press Enter to add)",
+      "likesPlaceholder": "e.g., Chicken, Rice, Apples",
+      "dislikesLabel": "Foods you dislike (Press Enter to add)",
+      "dislikesPlaceholder": "e.g., Broccoli, Fish",
+      "next": "Next",
+      "back": "Back"
+    },
+    "medical": {
+      "title": "Medical Details",
+      "subtitle": "Help us understand your health history",
+      "conditionsLabel": "Medical Conditions",
+      "conditionsPlaceholder": "e.g., Diabetes, Hypertension...",
+      "surgeriesLabel": "Surgeries / Injuries",
+      "surgeriesPlaceholder": "Add a surgery or injury",
+      "addSurgery": "Add",
+      "surgeryFields": {
+        "bodyPart": "Body Part",
+        "bodyPartPlaceholder": "e.g., Knee, Shoulder",
+        "name": "Injury/Surgery Name",
+        "namePlaceholder": "e.g., Meniscus tear",
+        "severity": "Severity (1-5)",
+        "status": "Status",
+        "statusPlaceholder": "Select status",
+        "statusOptions": {
+          "active": "Active",
+          "recovered": "Recovered",
+          "chronic": "Chronic"
+        },
+        "limitations": "Limitations",
+        "limitationsPlaceholder": "e.g., Avoid heavy lifting",
+        "diagnosticDate": "Diagnostic Date (Optional)",
+        "recoveryDate": "Recovery Date (Optional)"
+      },
+      "notesLabel": "Additional Notes",
+      "notesPlaceholder": "Any other details we should know...",
+      "complete": "Complete Setup",
+      "back": "Back"
+    }
+  }
+}

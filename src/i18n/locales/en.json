@@ -94,6 +94,14 @@
       "allergiesSection": "Allergies",
       "intolerancesSection": "Intolerances"
     },
+    "personal": {
+      "title": "Personal information",
+      "subtitle": "Confirm your date of birth",
+      "dateOfBirth": "Date of birth",
+      "validationRequired": "Date of birth is required",
+      "validationInvalid": "Date of birth is invalid",
+      "validationFuture": "Date of birth cannot be in the future"
+    },
     "metrics": {
       "title": "Current Measurements",
       "subtitle": "Help us personalize your plan",
@@ -143,3 +151,4 @@
     }
   }
 }
+

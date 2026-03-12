@@ -220,7 +220,73 @@ export const AllergenSelection = ({ onNext, onBack, initialData }: { onNext: (da
   )
 }
 
-// Step 3: Metrics Input
+// Step 3: Personal Information
+export const PersonalInfoInput = ({ onNext, onBack, initialData }: { onNext: (data: any) => void, onBack?: () => void, onComplete?: (data: any) => void, initialData: any }) => {
+  const { t } = useTranslation()
+  const [dateOfBirth, setDateOfBirth] = useState(initialData?.date_of_birth || '')
+
+  const validationError = (() => {
+    if (!dateOfBirth) {
+      return t('onboarding.personal.validationRequired')
+    }
+
+    const parsedDate = new Date(`${dateOfBirth}T00:00:00`)
+    if (Number.isNaN(parsedDate.getTime())) {
+      return t('onboarding.personal.validationInvalid')
+    }
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    if (parsedDate > today) {
+      return t('onboarding.personal.validationFuture')
+    }
+
+    return ''
+  })()
+
+  return (
+    <div className="space-y-6 w-full max-w-md mx-auto">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-gray-900">{t('onboarding.personal.title')}</h2>
+        <p className="mt-2 text-gray-600">{t('onboarding.personal.subtitle')}</p>
+      </div>
+
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">{t('onboarding.personal.dateOfBirth')}</label>
+        <input
+          type="date"
+          value={dateOfBirth}
+          onChange={(e) => setDateOfBirth(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-shadow"
+        />
+      </div>
+
+      {validationError ? (
+        <p className="text-sm text-red-600">{validationError}</p>
+      ) : null}
+
+      <div className="flex justify-center pt-8 gap-4">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex items-center px-6 py-3 text-gray-500 hover:text-gray-700 font-medium transition-colors"
+          >
+            {t('onboarding.back')}
+          </button>
+        )}
+        <button
+          onClick={() => onNext({ date_of_birth: dateOfBirth })}
+          disabled={Boolean(validationError)}
+          className="group relative flex items-center justify-center px-8 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-blue-500/30"
+        >
+          {t('onboarding.next')} <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Step 4: Metrics Input
 export const MetricInput = ({ onNext, onBack, initialData }: { onNext: (data: any) => void, onBack?: () => void, onComplete?: (data: any) => void, initialData: any }) => {
   const { t } = useTranslation()
   const [metrics, setMetrics] = useState({

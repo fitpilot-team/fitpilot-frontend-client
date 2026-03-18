@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import type { User } from '../services/auth.service'
+import { clearAccessToken, getAccessToken, setAccessToken, subscribeAccessToken } from '@/api/accessTokenStore'
+import { authService, type User } from '../services/auth.service'
 
 interface AuthContextType {
   user: User | null
@@ -18,26 +19,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Initialize from localStorage
-    const storedToken = localStorage.getItem('access_token')
     const storedUser = localStorage.getItem('user')
 
-    if (storedToken && storedUser && storedUser !== 'undefined') {
+    // Optional optimistic user hydration (token remains memory-only)
+    if (storedUser && storedUser !== 'undefined') {
       try {
-        setToken(storedToken)
         setUser(JSON.parse(storedUser))
       } catch (e) {
         console.error('Failed to parse user from local storage:', e)
         localStorage.removeItem('user')
-        localStorage.removeItem('access_token')
       }
-    } else {
-       // Clean up potentially corrupted state
-       if (storedUser === 'undefined') {
-          localStorage.removeItem('user')
-       }
+    } else if (storedUser === 'undefined') {
+      localStorage.removeItem('user')
     }
-    setIsLoading(false)
+
+    const unsubscribe = subscribeAccessToken((nextToken) => {
+      setToken(nextToken)
+      if (!nextToken) {
+        setUser(null)
+        localStorage.removeItem('user')
+      }
+    })
+
+    setToken(getAccessToken())
+
+    const bootstrapSession = async () => {
+      try {
+        // If a valid refresh cookie exists, axios will refresh and retry /me automatically.
+        const freshUser = await authService.getMe()
+        setUser(freshUser)
+        localStorage.setItem('user', JSON.stringify(freshUser))
+        setToken(getAccessToken())
+      } catch {
+        clearAccessToken()
+        localStorage.removeItem('user')
+        setUser(null)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    void bootstrapSession()
+
+    return unsubscribe
   }, [])
 
   const login = (newToken: string, newUser: User) => {
@@ -45,16 +69,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Login attempted with missing token or user')
         return
     }
-    localStorage.setItem('access_token', newToken)
+    setAccessToken(newToken)
     localStorage.setItem('user', JSON.stringify(newUser))
-    setToken(newToken)
     setUser(newUser)
   }
 
   const logout = () => {
-    localStorage.removeItem('access_token')
+    clearAccessToken()
     localStorage.removeItem('user')
-    setToken(null)
     setUser(null)
   }
 

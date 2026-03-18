@@ -78,6 +78,7 @@ export interface MenuItem {
     serving_unit_id: number | null;
     quantity: number;
     recipe_id: number | null;
+    equivalent_quantity: string;
     foods: Food;
     exchange_groups: ExchangeGroup;
     serving_units: any | null;
@@ -114,4 +115,40 @@ export const menusService = {
     const response = await api.get<Menu[]>('/v1/menus', { params });
     return response.data;
   },
+
+  getMenusPool: async (clientId: string, date: string) => {
+    const response = await api.get<Menu[]>('/v1/menus/pool', { 
+        params: { client_id: clientId, date } 
+    });
+    return response.data;
+  },
+
+  getMenusPoolCalendar: async (clientId: string, date: string) => {
+    const response = await api.get<Menu[]>('/v1/menus/pool/calendar', { 
+        params: { client_id: clientId, date } 
+    });
+    return response.data;
+  },
+
+  getMenuById: async (id: number) => {
+    const response = await api.get<Menu>(`/v1/menus/${id}`);
+    return response.data;
+  },
+
+  swapMenu: async (data: { client_id: number; date: string; new_menu_id: number }) => {
+    const response = await api.patch('/v1/menus/daily/swap', data);
+    return response.data;
+  },
+
+  getDailyMenu: async (clientId: string, date: string) => {
+    const response = await api.get<Menu>(`/v1/menus/daily`, {
+        params: { client_id: clientId, date }
+    });
+    return response.data;
+  },
+
+  getFoodsByExchangeGroup: async (groupId: number) => {
+    const response = await api.get<Food[]>(`/v1/foods/exchange-group/${groupId}`);
+    return response.data;
+  }
 };

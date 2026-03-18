@@ -23,7 +23,7 @@ export interface Injury {
   name: string
   body_part: string
   severity: number
-  status: 'active' | 'recovered' | 'chronic'
+  status: 'active' | 'recovering' | 'resolved' | 'chronic'
   limitations: string
   diagnosis_date?: string
   recovery_date?: string

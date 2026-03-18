@@ -1,12 +1,17 @@
 
 import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { menusService, type MenuMeal, type MenuItem, type FoodNutritionValue } from '../services/menus.service';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { menusService, type MenuMeal, type MenuItem, type FoodNutritionValue, type Menu } from '../services/menus.service';
+import { SwapFoodModal } from '../components/SwapFoodModal';
+import { MenusPoolModal } from '../components/MenusPoolModal';
+import { MiniCalendar } from '../components/MiniCalendar';
 import { authService } from '../../auth/services/auth.service';
-import { Calendar as CalendarIcon, Utensils, X, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, Utensils, X, ChevronRight, RefreshCw } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
+
 export const MenusPage: React.FC = () => {
+    const queryClient = useQueryClient();
     const { data: user } = useQuery({
         queryKey: ['me'],
         queryFn: authService.getMe
@@ -14,11 +19,16 @@ export const MenusPage: React.FC = () => {
 
     const clientId = user?.id?.toString();
 
-    const { data: menus, isLoading, error } = useQuery({
-        queryKey: ['menus', clientId],
-        queryFn: () => menusService.getMenus(clientId),
-        enabled: !!clientId
-    });
+    // Swap Modal State
+    const [swapModalOpen, setSwapModalOpen] = useState(false);
+    const [swappingItem, setSwappingItem] = useState<MenuItem | null>(null);
+
+
+    // Pool Modal State
+    const [isPoolModalOpen, setIsPoolModalOpen] = useState(false);
+    
+    // Mini Calendar State
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     // State for selected item (and panel)
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
@@ -27,6 +37,54 @@ export const MenusPage: React.FC = () => {
     // State for selected date. Default to today.
     const [selectedDate, setSelectedDate] = useState(new Date());
 
+    // 1. Fetch Pool for Date (Active Options for Modal) - Keep this for the modal
+    const dateStr = useMemo(() => selectedDate.toISOString().split('T')[0], [selectedDate]);
+    
+    const { data: menuPool, isLoading: isPoolLoading } = useQuery({
+        queryKey: ['menusPool', clientId, dateStr],
+        queryFn: () => menusService.getMenusPool(clientId!, dateStr),
+        enabled: !!clientId && isPoolModalOpen
+    });
+
+    // 2. Fetch Daily Active Menu (Replacing old filtering logic)
+    const { data: activeMenu, isLoading: isMenuLoading, error } = useQuery({
+        queryKey: ['dailyMenu', clientId, dateStr],
+        queryFn: () => menusService.getDailyMenu(clientId!, dateStr),
+        enabled: !!clientId
+    });
+
+    // 3. Fetch Calendar Pool (for markers)
+    // We cache by month (YYYY-MM) to avoid refetching on every day selection
+    const { data: calendarMenus } = useQuery({
+        queryKey: ['menusPoolCalendar', clientId, dateStr.substring(0, 7)], 
+        queryFn: () => menusService.getMenusPoolCalendar(clientId!, dateStr),
+        enabled: !!clientId
+    });
+
+    const markedDates = useMemo(() => {
+        if (!calendarMenus) return [];
+        return calendarMenus.map(m => {
+            // Handle YYYY-MM-DD string to avoid timezone shift (UTC vs Local)
+            if (typeof m.start_date === 'string' && m.start_date.includes('-')) {
+                const [y, mth, d] = m.start_date.split('-').map(Number);
+                // User requested shift: Menus for specific date should appear +1 day later in calendar
+                // e.g. "Monday 2 shows on 3"
+                return new Date(y, mth - 1, d + 1);
+            }
+            // Fallback for Date objects or other formats (try to shift +1 day too if needed, but assuming string here)
+            const dt = new Date(m.start_date);
+            dt.setDate(dt.getDate() + 1);
+            return dt;
+        });
+    }, [calendarMenus]);
+
+
+
+    // Active meals come from the detailed menu
+    const activeMeals = useMemo(() => {
+        return activeMenu?.menu_meals || [];
+    }, [activeMenu]);
+
     // Generate days for the selector (e.g., current week)
     const weekDays = useMemo(() => {
         const days = [];
@@ -34,7 +92,6 @@ export const MenusPage: React.FC = () => {
         // Let's do a sliding window of 7 days centered on selectedDate or today?
         // User asked for "dias de la semana", usually implying fixed Mon-Sun or dynamic window.
         // Let's do a dynamic window of +/- 3 days from "current focus" or just fixed current week.
-        // Let's try 7 days centered on today, or better: 
         // Let's keep it simple: today - 3 to today + 3
         const start = new Date(selectedDate);
         start.setDate(selectedDate.getDate() - 3);
@@ -54,29 +111,6 @@ export const MenusPage: React.FC = () => {
                d1.getDate() === d2.getDate();
     };
 
-    // Filter menus active on selectedDate
-    const activeMeals = useMemo(() => {
-        if (!menus) return [];
-
-        const target = new Date(selectedDate);
-        target.setHours(0, 0, 0, 0);
-
-        // Find menus that include this date
-        const activeMenus = menus.filter(menu => {
-            const start = new Date(menu.start_date);
-            const end = new Date(menu.end_date);
-            start.setHours(0, 0, 0, 0);
-            end.setHours(23, 59, 59, 999);
-            return target >= start && target <= end;
-        });
-
-        // Collect all meals from active menus
-        // Flatten array of meals
-        return activeMenus.flatMap(m => m.menu_meals);
-    }, [menus, selectedDate]);
-
-
-    if (isLoading) return <div className="flex justify-center p-8 text-emerald-600">Loading menus...</div>;
     if (error) return <div className="text-red-500 p-4">Error loading menus</div>;
 
 
@@ -92,13 +126,51 @@ export const MenusPage: React.FC = () => {
 
 
 
+
+
+    // Mutation to swap menu
+    const swapMenuMutation = useMutation({
+        mutationFn: menusService.swapMenu,
+        onSuccess: () => {
+            console.log('Swap success');
+            queryClient.invalidateQueries({ queryKey: ['dailyMenu'] }); // Refresh the daily menu fetch
+            setIsPoolModalOpen(false);
+        },
+        onError: (error) => {
+            console.error('Swap error:', error);
+            alert('Error al cambiar el menú. Intenta nuevamente.');
+        }
+    });
+
+    const isLoading = isMenuLoading || swapMenuMutation.isPending;
+
+    const handleMenuSelect = (menu: Menu) => {
+        console.log('Selection triggered for menu:', menu.id);
+        if (!clientId) {
+            console.error('Missing Client ID');
+            return;
+        }
+        
+        console.log('Mutating with:', {
+            client_id: parseInt(clientId),
+            date: dateStr,
+            new_menu_id: menu.id
+        });
+
+        swapMenuMutation.mutate({
+            client_id: parseInt(clientId),
+            date: dateStr,
+            new_menu_id: menu.id
+        });
+    };
+
     return (
         <div className="flex h-full overflow-hidden bg-gray-50">
            
            {/* Main Content Area */}
             <div className={`
-                flex-1 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
-                ${selectedItem ? 'w-[65%] shrink-0 pr-6' : 'w-full'}
+                flex flex-col transition-all duration-500 ease-in-out
+                ${selectedMeal ? 'w-[65%] shrink-0 pr-6 grow-0' : 'w-full flex-1'}
             `}>
                 <div className="w-full p-4 sm:p-6 lg:p-8 h-full overflow-y-auto no-scrollbar">
                     
@@ -106,9 +178,35 @@ export const MenusPage: React.FC = () => {
                         <div>
                         <h1 className="text-2xl font-bold text-gray-900">Plan de Alimentación</h1>
                         <p className="text-gray-500 text-sm">Organiza tus comidas diarias</p>
+                        <p className="text-gray-500 text-sm">Organiza tus comidas diarias</p>
                         </div>
-                        <div className="bg-emerald-50 text-emerald-600 p-2 rounded-lg">
-                            <CalendarIcon size={20} />
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setIsPoolModalOpen(true)}
+                                className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl transition-colors shadow-sm shadow-emerald-200 font-bold text-sm"
+                            >
+                                <RefreshCw size={18} />
+                                <span>Cambiar Menú</span>
+                            </button>
+                            <div className="relative">
+                                <button 
+                                    onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                                    className="bg-emerald-50 text-emerald-600 p-2 rounded-lg hover:bg-emerald-100 transition-colors"
+                                >
+                                    <CalendarIcon size={20} />
+                                </button>
+
+                            {isCalendarOpen && (
+                                    <MiniCalendar 
+                                        selectedDate={selectedDate}
+                                        onDateSelect={(date) => {
+                                            setSelectedDate(date);
+                                        }}
+                                        onClose={() => setIsCalendarOpen(false)}
+                                        markedDates={markedDates}
+                                    />
+                                )}
+                            </div>
                         </div>
                     </header>
 
@@ -143,7 +241,23 @@ export const MenusPage: React.FC = () => {
                     </div>
 
                     {/* Meals List */}
-                    {activeMeals.length === 0 ? (
+                    {isLoading ? (
+                        <div className={`grid gap-6 transition-all duration-500 ${selectedItem ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'}`}>
+                            {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 animate-pulse">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <div className="h-6 w-32 bg-gray-200 rounded-lg"></div>
+                                        <div className="h-8 w-24 bg-gray-200 rounded-xl"></div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="h-16 bg-gray-50 rounded-2xl w-full"></div>
+                                        <div className="h-16 bg-gray-50 rounded-2xl w-full"></div>
+                                        <div className="h-16 bg-gray-50 rounded-2xl w-full"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : activeMeals.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 bg-white rounded-3xl border-2 border-dashed border-gray-100 text-center shadow-sm">
                             <div className="bg-emerald-50 p-4 rounded-full mb-4">
                                 <Utensils className="w-8 h-8 text-emerald-300" />
@@ -164,6 +278,10 @@ export const MenusPage: React.FC = () => {
                                         setSelectedMeal(meal);
                                     }}
                                     selectedId={selectedItem?.id}
+                                    onSwapFood={(item) => {
+                                        setSwappingItem(item);
+                                        setSwapModalOpen(true);
+                                    }}
                                 />
                             ))}
                         </div>
@@ -174,21 +292,74 @@ export const MenusPage: React.FC = () => {
             {/* Side Panel */}
             <div 
                 className={`
-                    border-l border-gray-200 bg-white h-full shadow-2xl z-20 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden
-                    ${selectedItem ? 'w-[35%] translate-x-0 opacity-100' : 'w-0 translate-x-20 opacity-0'}
+                    fixed top-0 right-0 h-screen border-l border-gray-200 bg-white shadow-2xl z-50 transition-all duration-500 ease-in-out overflow-hidden
+                    ${selectedMeal ? 'w-[35%] translate-x-0 opacity-100' : 'w-0 translate-x-20 opacity-0 pointer-events-none'}
                 `}
             >
                 <div className="h-full min-w-[350px]">
-                    <NutrientPanel 
-                        selectedMeal={selectedMeal} 
-                        dailyMeals={activeMeals}
-                        onClose={() => {
+                   {isLoading ? (
+                        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 h-full animate-pulse">
+                            <div className="h-8 w-48 bg-gray-200 rounded-lg mb-8 mx-auto"></div>
+                            
+                            <div className="flex justify-center mb-8">
+                                <div className="h-48 w-48 rounded-full bg-gray-200 border-8 border-gray-50"></div>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-4 mb-8">
+                                <div className="h-20 bg-gray-50 rounded-2xl"></div>
+                                <div className="h-20 bg-gray-50 rounded-2xl"></div>
+                                <div className="h-20 bg-gray-50 rounded-2xl"></div>
+                            </div>
+
+                             <div className="space-y-3">
+                                <div className="h-10 bg-gray-50 rounded-xl w-full"></div>
+                                <div className="h-10 bg-gray-50 rounded-xl w-full"></div>
+                                <div className="h-10 bg-gray-50 rounded-xl w-full"></div>
+                            </div>
+                        </div>
+                   ) : (
+                       <NutrientPanel 
+                          selectedItem={selectedItem} 
+                          selectedMeal={selectedMeal}
+                          dailyMeals={activeMeals} 
+                          onClose={() => {
                             setSelectedItem(null);
                             setSelectedMeal(null);
                         }} 
-                    />
+                        />
+                   )}
                 </div>
             </div>
+            {/* Swap Modal */}
+            {isPoolModalOpen && clientId && (
+                <MenusPoolModal
+                    isOpen={isPoolModalOpen}
+                    onClose={() => setIsPoolModalOpen(false)}
+                    menus={menuPool || []}
+                    date={selectedDate}
+                    onSelect={handleMenuSelect}
+                    isSwapping={swapMenuMutation.isPending}
+                    isLoading={isPoolLoading}
+                />
+            )}
+            {swappingItem && (
+                <SwapFoodModal 
+                    isOpen={swapModalOpen} 
+                    onClose={() => {
+                        setSwapModalOpen(false);
+                        setSwappingItem(null);
+                    }}
+                    currentItem={swappingItem}
+                    onSelect={() => {
+                        // Invalidate to refresh the active menu view
+                        queryClient.invalidateQueries({ queryKey: ['dailyMenu'] });
+                        
+                        setSwapModalOpen(false);
+                        setSwappingItem(null);
+
+                    }}
+                />
+            )}
         </div>
     );
 };
@@ -282,19 +453,27 @@ const calculateDailyMacro = (meals: MenuMeal[], field: keyof FoodNutritionValue)
 }
 
 
-const MealCard: React.FC<{ meal: MenuMeal; onSelectItem: (item: MenuItem, meal: MenuMeal) => void; selectedId?: number }> = ({ meal, onSelectItem, selectedId }) => {
+const MealCard: React.FC<{ 
+    meal: MenuMeal; 
+    onSelectItem: (item: MenuItem | null, meal: MenuMeal) => void; 
+    selectedId?: number;
+    onSwapFood: (item: MenuItem) => void;
+}> = ({ meal, onSelectItem, selectedId, onSwapFood }) => {
     const totalItems = meal.menu_items_menu_items_menu_meal_idTomenu_meals.length;
     
 
 
     return (
-        <div className="group relative bg-white rounded-3xl p-1 shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent opacity-0 group-hover:opacity-100 rounded-3xl transition-opacity duration-300" />
+        <div 
+            onClick={() => onSelectItem(null, meal)}
+            className="group relative bg-white rounded-3xl p-1 shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 cursor-pointer"
+        >
+            <div className="absolute inset-0 bg-linear-to-br from-emerald-50/50 to-transparent opacity-0 group-hover:opacity-100 rounded-3xl transition-opacity duration-300" />
             
             <div className="relative p-5">
                 {/* Header */}
-                <div className="flex items-start justify-between mb-6 cursor-pointer" onClick={() => onSelectItem(meal.menu_items_menu_items_menu_meal_idTomenu_meals[0], meal)}> 
-                    {/* Clicking header selects the meal (using first item as dummy proxy or just passing meal if we refactor handler) */}
+                <div className="flex items-start justify-between mb-6"> 
+                    {/* Header items content... */}
                     {/* Actually, let's keep it simple: pass null item for 'Meal Selection' if we update types, or just select first item to trigger context */}
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-inner">
@@ -312,7 +491,7 @@ const MealCard: React.FC<{ meal: MenuMeal; onSelectItem: (item: MenuItem, meal: 
                     
                     <div className="flex flex-col items-end gap-2">
                         <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-xl">
-                            <Utensils size={14} className="stroke-[3]" />
+                            <Utensils size={14} className="stroke-3" />
                             <span className="font-bold text-sm">
                                 {Math.round(meal.total_calories)} Kcal
                             </span>
@@ -363,8 +542,18 @@ const MealCard: React.FC<{ meal: MenuMeal; onSelectItem: (item: MenuItem, meal: 
                                             {item.exchange_groups?.name}
                                         </p>
                                     </div>
-                                    <div className={`transition-opacity duration-200 ${isSelected ? 'opacity-100 text-emerald-500' : 'opacity-0 text-gray-300'}`}>
-                                        <ChevronRight size={16} />
+                                    <div className={`transition-opacity duration-200 flex items-center gap-2 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onSwapFood(item);
+                                            }}
+                                            className="p-1.5 rounded-lg hover:bg-emerald-100 text-emerald-500 hover:text-emerald-700 transition-colors"
+                                            title="Cambiar alimento"
+                                        >
+                                            <RefreshCw size={14} />
+                                        </button>
+                                        <ChevronRight size={16} className={isSelected ? 'text-emerald-500' : 'text-gray-300'} />
                                     </div>
                                 </div>
                              );
@@ -516,29 +705,114 @@ const aggregateMicros = (meals: MenuMeal[]) => {
 // Nutrient Panel Component
 const NutrientPanel: React.FC<{ 
     selectedMeal: MenuMeal | null; 
+    selectedItem: MenuItem | null;
     dailyMeals: MenuMeal[];
     onClose: () => void; 
-}> = ({ selectedMeal, dailyMeals, onClose }) => {
+}> = ({ selectedMeal, selectedItem, dailyMeals, onClose }) => {
     
     const [activeTab, setActiveTab] = useState<'macros' | 'micros'>('macros');
 
     const dailyMicros = useMemo(() => aggregateMicros(dailyMeals), [dailyMeals]);
     const mealMicros = useMemo(() => selectedMeal?.total_micronutrients || [], [selectedMeal]);
+    
+    // Determine what to show: Item or Meal
+    const isItemView = !!selectedItem;
+    
+    // Titles
+    const leftTitle = isItemView ? `ALIMENTO: ${selectedItem?.foods.name.toUpperCase()}` : `COMIDA: ${selectedMeal?.name.toUpperCase()}`;
+    const rightTitle = isItemView ? `COMIDA: ${selectedMeal?.name.toUpperCase()}` : `PLAN COMPLETO (DÍA)`;
 
-    if (!selectedMeal) return <div className="w-full text-center mt-20 text-gray-400">Selecciona un alimento</div>;
+    const subTitle = isItemView ? 'Alimento vs. Comida' : 'Comida vs. Plan Completo';
 
-    // Meal stats
-    const mealCals = selectedMeal.total_calories; // Use API provided total
+    // Calculate Micros for target
+    // If Item: need to construct a list similar to total_micronutrients but calculated for the item 
+    // The API doesn't seem to return pre-calculated micros for items in the same structure as meals easily without calculating.
+    // However, the user request specifically asked for "shows information instead of meal...".
+    // For micros, implementing item-level calc from raw food_micronutrient_values might be complex if not readily available in 'MenuItem'.
+    // Looking at MenuItem type: it has 'foods' -> 'food_nutrition_values' -> 'food_micronutrient_values'.
+    // We can try to aggregate that if needed. 
+    // For now, let's stick to Macros as explicitly requested in the prompt "macro and micro panel...".
+    // Let's try to map item micros if possible, or fallback gracefully.
+    // Actually, `selectedMeal.total_micronutrients` is available. `selectedItem` micros are harder to get without calculation.
+    // Let's implement a basic micro calculator for item if possible, or just show Meal micros for now if Item micros are too hard,
+    // BUT the prompt says "muestra la del alimento seleccionado".
+    // Let's see `Food` interface. `food_nutrition_values` has `food_micronutrient_values`.
+    
+    const itemMicros = useMemo(() => {
+        if (!selectedItem) return selectedMeal?.total_micronutrients || [];
+        
+        // Calculate item micros
+        // Need to find standard nutrition value
+        const fnv = selectedItem.foods.food_nutrition_values?.find(v => v.state === 'standard') || selectedItem.foods.food_nutrition_values?.[0];
+        if (!fnv || !fnv.food_micronutrient_values) return [];
+
+        // We need 'quantity' and 'base_serving' to scale.
+        // Assuming calculateItemCalories logic applies similarly.
+        const qty = selectedItem.quantity;
+        const baseServingStr = fnv.base_serving_size || selectedItem.foods.base_serving_size || '100'; // fallback
+        let baseServing = parseFloat(baseServingStr);
+        if (isNaN(baseServing) || baseServing === 0) baseServing = 100; // default?
+
+        return fnv.food_micronutrient_values.map(mv => ({
+             id: mv.micronutrient_id,
+             name: mv.micronutrients?.name || 'Unknown',
+             unit: mv.micronutrients?.unit || '',
+             category: mv.micronutrients?.category || 'General',
+             amount: (qty / baseServing) * parseFloat(mv.amount)
+        }));
+
+    }, [selectedItem, selectedMeal]);
+
+    if (!selectedMeal) return <div className="w-full text-center mt-20 text-gray-400">Selecciona un elemento</div>;
+
+    // Stats Calculations
+    
+    // 1. Meal Stats (Always needed)
+    const mealCals = selectedMeal.total_calories;
     const mealProt = calculateMealMacro(selectedMeal, 'protein_g');
     const mealCarbs = calculateMealMacro(selectedMeal, 'carbs_g');
     const mealFat = calculateMealMacro(selectedMeal, 'fat_g');
+    const mealGL = selectedMeal.total_glycemic_load;
 
-    // Daily stats
+    // 2. Daily Stats (Needed for Meal View)
     const dailyCals = calculateDailyCalories(dailyMeals);
     const dailyProt = calculateDailyMacro(dailyMeals, 'protein_g');
     const dailyCarbs = calculateDailyMacro(dailyMeals, 'carbs_g');
     const dailyFat = calculateDailyMacro(dailyMeals, 'fat_g');
     const dailyGL = calculateDailyGlycemicLoad(dailyMeals);
+
+    // 3. Item Stats (Needed for Item View)
+    let itemCals = 0;
+    let itemProt = 0;
+    let itemCarbs = 0;
+    let itemFat = 0;
+    let itemGL = 0;
+
+    if (selectedItem) {
+        itemCals = calculateItemCalories(selectedItem);
+        itemProt = calculateItemMacro(selectedItem, 'protein_g');
+        itemCarbs = calculateItemMacro(selectedItem, 'carbs_g');
+        itemFat = calculateItemMacro(selectedItem, 'fat_g');
+        
+        const fnv = selectedItem.foods.food_nutrition_values?.find(v => v.state === 'standard') || selectedItem.foods.food_nutrition_values?.[0];
+         if (fnv && fnv.glycemic_load) {
+            const glPerServing = parseFloat(fnv.glycemic_load);
+             const baseServingStr = fnv.base_serving_size || selectedItem.foods.base_serving_size || '100';
+            let baseServing = parseFloat(baseServingStr);
+             if (isNaN(baseServing) || baseServing === 0) baseServing = 100;
+             itemGL = (selectedItem.quantity / baseServing) * glPerServing;
+         }
+         itemGL = Math.round(itemGL * 10) / 10;
+    }
+
+    // Assign Left/Right Data
+    const leftData = isItemView ? 
+        { cals: itemCals, prot: itemProt, carbs: itemCarbs, fat: itemFat, gl: itemGL, micros: itemMicros } :
+        { cals: mealCals, prot: mealProt, carbs: mealCarbs, fat: mealFat, gl: mealGL, micros: mealMicros };
+
+    const rightData = isItemView ?
+        { cals: mealCals, prot: mealProt, carbs: mealCarbs, fat: mealFat, gl: mealGL, micros: mealMicros } :
+        { cals: dailyCals, prot: dailyProt, carbs: dailyCarbs, fat: dailyFat, gl: dailyGL, micros: dailyMicros };
 
     return (
         <div className="h-full flex flex-col bg-gray-50/50 overflow-hidden">
@@ -569,42 +843,42 @@ const NutrientPanel: React.FC<{
                         {activeTab === 'macros' ? 'Resumen Nutricional' : 'Micronutrientes'}
                     </h2>
                     <p className="text-sm text-gray-500">
-                        {selectedMeal.name} vs. Plan Completo
+                        {subTitle}
                     </p>
                 </div>
 
                 {activeTab === 'macros' ? (
                     <div className="grid grid-cols-2 gap-4">
                         <NutrientCard 
-                            title={`COMIDA: ${selectedMeal.name.toUpperCase()}`}
-                            calories={mealCals}
-                            protein={mealProt}
-                            carbs={mealCarbs}
-                            fat={mealFat}
-                            glycemicLoad={selectedMeal.total_glycemic_load}
+                            title={leftTitle}
+                            calories={leftData.cals}
+                            protein={leftData.prot}
+                            carbs={leftData.carbs}
+                            fat={leftData.fat}
+                            glycemicLoad={leftData.gl}
                         />
 
                         <NutrientCard 
-                            title="PLAN COMPLETO (DÍA)"
-                            calories={dailyCals}
-                            protein={dailyProt}
-                            carbs={dailyCarbs}
-                            fat={dailyFat}
-                            glycemicLoad={dailyGL}
+                            title={rightTitle}
+                            calories={rightData.cals}
+                            protein={rightData.prot}
+                            carbs={rightData.carbs}
+                            fat={rightData.fat}
+                            glycemicLoad={rightData.gl}
                         />
                     </div>
                 ) : (
-                    <div className="space-y-6">
-                         {/* Meal Micros */}
+                    <div className="grid grid-cols-2 gap-4">
+                         {/* Left Micros */}
                          <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
                             <div className="text-center mb-4">
                                 <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider block w-fit mx-auto">
-                                    COMIDA: {selectedMeal.name.toUpperCase()}
+                                    {leftTitle}
                                 </span>
                             </div>
                             <div className="space-y-3">
-                                {mealMicros.length > 0 ? (
-                                    mealMicros.map((micro, idx) => (
+                                {leftData.micros.length > 0 ? (
+                                    leftData.micros.map((micro: any, idx: number) => (
                                         <div key={idx} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
                                             <div>
                                                 <span className="text-sm font-bold text-gray-700 block">{micro.name}</span>
@@ -622,23 +896,23 @@ const NutrientPanel: React.FC<{
                             </div>
                          </div>
 
-                         {/* Daily Micros */}
+                         {/* Right Micros */}
                          <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
                             <div className="text-center mb-4">
                                 <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider block w-fit mx-auto">
-                                    PLAN COMPLETO (DÍA)
+                                    {rightTitle}
                                 </span>
                             </div>
                             <div className="space-y-3">
-                                {dailyMicros.length > 0 ? (
-                                    dailyMicros.map((micro, idx) => (
+                                {rightData.micros.length > 0 ? (
+                                    rightData.micros.map((micro: any, idx: number) => (
                                         <div key={idx} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
                                             <div>
                                                 <span className="text-sm font-bold text-gray-700 block">{micro.name}</span>
                                                 <span className="text-[10px] text-gray-400 uppercase font-semibold">{micro.category}</span>
                                             </div>
                                             <div className="text-right">
-                                                 <span className="text-sm font-bold text-gray-900">{micro.amount.toFixed(1)}</span>
+                                                 <span className="text-sm font-bold text-gray-900">{parseFloat(micro.amount.toString()).toFixed(1)}</span>
                                                  <span className="text-xs text-gray-500 ml-1">{micro.unit}</span>
                                             </div>
                                         </div>

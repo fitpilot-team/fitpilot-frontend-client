@@ -17,6 +17,8 @@ import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { CompositionPage } from "@/features/dashboard/CompositionPage";
 import { MenusPage } from "@/features/menus/pages/MenusPage";
 import { OnboardingPage } from "@/features/onboarding/pages/OnboardingPage";
+import { ProfilePage } from "@/features/users/pages/ProfilePage";
+import { clearAccessToken } from "@/api/accessTokenStore";
 
 const TanStackRouterDevtools =
   import.meta.env.PROD
@@ -49,16 +51,6 @@ const mainLayoutRoute = createRoute({
   id: "main",
   component: MainLayout,
   beforeLoad: async ({ location }) => {
-    const token = localStorage.getItem('access_token')
-    if (!token) {
-      throw redirect({
-        to: '/auth/sign-in',
-        search: {
-          redirect: location.href,
-        },
-      })
-    }
-
     try {
         // Validate token and get user info
         const user = await authService.getMe()
@@ -71,7 +63,7 @@ const mainLayoutRoute = createRoute({
     } catch (error) {
         if (error instanceof Response) throw error;
         // If validation fails, clear storage and redirect
-        localStorage.removeItem('access_token')
+        clearAccessToken()
         localStorage.removeItem('user')
         throw redirect({
             to: '/auth/sign-in',
@@ -89,10 +81,6 @@ const onboardingRoute = createRoute({
   path: "/onboarding",
   component: OnboardingPage,
   beforeLoad: async () => {
-    const token = localStorage.getItem('access_token')
-    if (!token) {
-      throw redirect({ to: '/auth/sign-in' })
-    }
     try {
        const user = await authService.getMe()
        if (user.onboarding_status === 'completed') {
@@ -101,6 +89,8 @@ const onboardingRoute = createRoute({
     } catch(e) {
        // if error or redirect thrown above
        if (e instanceof Response) throw e; 
+       clearAccessToken()
+       localStorage.removeItem('user')
        throw redirect({ to: '/auth/sign-in' })
     }
   }
@@ -138,6 +128,12 @@ const menusRoute = createRoute({
   component: MenusPage,
 });
 
+const profileRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: "/profile",
+  component: ProfilePage,
+});
+
 // auth
 const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -171,7 +167,7 @@ const registerLinkRoute = createRoute({
 });
 
 const routeTree = rootRoute.addChildren([
-  mainLayoutRoute.addChildren([indexRoute, productsRoute, dashboardRoute, compositionRoute, menusRoute]),
+  mainLayoutRoute.addChildren([indexRoute, productsRoute, dashboardRoute, compositionRoute, menusRoute, profileRoute]),
   authLayoutRoute.addChildren([loginRoute, registerRoute, forgotPasswordRoute, registerLinkRoute]),
   onboardingRoute, // Add onboarding route
 ]);

@@ -5,28 +5,50 @@ import { usersService } from '@/features/users/services/users.service'
 import type { Goal, Allergen } from '@/features/users/services/types'
 
 // Reusable Chip Component
-const Chip = ({ label, isSelected, onClick, onRemove }: { label: string, isSelected?: boolean, onClick?: () => void, onRemove?: () => void }) => (
-  <div 
-    onClick={onClick}
-    className={`
-      inline-flex items-center px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer border
-      ${isSelected 
-        ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
-        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-      }
-    `}
-  >
-    {label}
-    {onRemove && (
-      <button 
-        onClick={(e) => { e.stopPropagation(); onRemove(); }}
-        className="ml-2 hover:text-red-200 focus:outline-none"
-      >
-        <X size={14} />
-      </button>
-    )}
-  </div>
-)
+const Chip = ({ label, isSelected, onClick, onRemove, variant = 'default' }: { label: string, isSelected?: boolean, onClick?: () => void, onRemove?: () => void, variant?: 'default' | 'success' | 'danger' }) => {
+  const getVariantStyles = () => {
+    if (isSelected) return 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+    
+    switch (variant) {
+      case 'success':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+      case 'danger':
+        return 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+      default:
+        return 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+    }
+  }
+
+  const getButtonStyles = () => {
+    if (isSelected) return 'text-blue-200 hover:text-white'
+    
+    switch (variant) {
+        case 'success': return 'text-emerald-400 hover:text-emerald-800'
+        case 'danger': return 'text-rose-400 hover:text-rose-800'
+        default: return 'text-gray-400 hover:text-gray-600'
+    }
+  }
+
+  return (
+    <div 
+      onClick={onClick}
+      className={`
+        inline-flex items-center px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer border
+        ${getVariantStyles()}
+      `}
+    >
+      {label}
+      {onRemove && (
+        <button 
+          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          className={`ml-2 focus:outline-none ${getButtonStyles()}`}
+        >
+          <X size={14} />
+        </button>
+      )}
+    </div>
+  )
+}
 
 // Step 1: Goal Selection
 export const GoalSelection = ({ onNext, initialData }: { onNext: (data: any) => void, onBack?: () => void, onComplete?: (data: any) => void, initialData: any }) => {
@@ -53,7 +75,7 @@ export const GoalSelection = ({ onNext, initialData }: { onNext: (data: any) => 
 
   const toggleGoal = (id: number) => {
     setSelectedGoals(prev => 
-      prev.includes(id) ? prev.filter(g => g !== id) : [...prev, id]
+      prev.includes(id) ? [] : [id]
     )
   }
 
@@ -362,6 +384,7 @@ export const PreferenceInput = ({ onNext, onBack, initialData }: { onNext: (data
               <Chip
                 key={item}
                 label={item}
+                variant="success"
                 onRemove={() => removeLike(item)}
               />
             ))}
@@ -384,6 +407,7 @@ export const PreferenceInput = ({ onNext, onBack, initialData }: { onNext: (data
               <Chip
                 key={item}
                 label={item}
+                variant="danger"
                 onRemove={() => removeDislike(item)}
               />
             ))}
@@ -523,7 +547,8 @@ export const MedicalDetailsInput = ({ onComplete, onBack, initialData }: { onCom
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white"
                 >
                   <option value="active">{t('onboarding.medical.surgeryFields.statusOptions.active')}</option>
-                  <option value="recovered">{t('onboarding.medical.surgeryFields.statusOptions.recovered')}</option>
+                  <option value="recovering">{t('onboarding.medical.surgeryFields.statusOptions.recovering')}</option>
+                  <option value="resolved">{t('onboarding.medical.surgeryFields.statusOptions.resolved')}</option>
                   <option value="chronic">{t('onboarding.medical.surgeryFields.statusOptions.chronic')}</option>
                 </select>
              </div>
@@ -583,9 +608,10 @@ export const MedicalDetailsInput = ({ onComplete, onBack, initialData }: { onCom
                         <span className="px-2 py-0.5 bg-gray-100 rounded-full">Severity: {surgery.severity}</span>
                          <span className={`px-2 py-0.5 rounded-full ${
                            surgery.status === 'active' ? 'bg-red-100 text-red-700' :
-                           surgery.status === 'recovered' ? 'bg-green-100 text-green-700' :
-                           'bg-yellow-100 text-yellow-700'
-                         }`}>{surgery.status}</span>
+                           surgery.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                           surgery.status === 'recovering' ? 'bg-yellow-100 text-yellow-700' :
+                           'bg-gray-100 text-gray-700'
+                         }`}>{t(`onboarding.medical.surgeryFields.statusOptions.${surgery.status}`)}</span>
                          {surgery.diagnostic_date && <span>Dx: {surgery.diagnostic_date}</span>}
                       </div>
                       {surgery.limitations && (

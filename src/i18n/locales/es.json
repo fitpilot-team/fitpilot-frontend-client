@@ -128,7 +128,8 @@
         "statusPlaceholder": "Seleccionar estado",
         "statusOptions": {
           "active": "Activa",
-          "recovered": "Recuperada",
+          "recovering": "En recuperación",
+          "resolved": "Resuelta",
           "chronic": "Crónica"
         },
         "limitations": "Limitaciones",

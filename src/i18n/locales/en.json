@@ -128,7 +128,8 @@
         "statusPlaceholder": "Select status",
         "statusOptions": {
           "active": "Active",
-          "recovered": "Recovered",
+          "recovering": "Recovering",
+          "resolved": "Resolved",
           "chronic": "Chronic"
         },
         "limitations": "Limitations",

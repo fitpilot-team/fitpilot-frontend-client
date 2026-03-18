@@ -1,10 +1,12 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authService } from './auth.service'
 import type { CompleteRegistrationDto, LoginDto } from './auth.service'
 
 export const authKeys = {
   all: ['auth'] as const,
   verifyToken: (token: string) => [...authKeys.all, 'verify-token', token] as const,
+  me: () => [...authKeys.all, 'me'] as const,
+  sessions: () => [...authKeys.all, 'sessions'] as const,
 }
 
 export const useVerifyTokenQuery = (token: string | undefined) => {
@@ -37,9 +39,38 @@ export const useLoginMutation = () => {
 
 export const useMeQuery = (enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['auth', 'me'],
+    queryKey: authKeys.me(),
     queryFn: authService.getMe,
     enabled,
     staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+export const useSessionsQuery = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: authKeys.sessions(),
+    queryFn: authService.getSessions,
+    enabled,
+    staleTime: 1000 * 30, // 30 seconds
+  })
+}
+
+export const useRevokeSessionMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (sessionId: number | string) => authService.revokeSession(sessionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.sessions() })
+    },
+  })
+}
+
+export const useLogoutAllSessionsMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: authService.logoutAllSessions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.sessions() })
+    },
   })
 }

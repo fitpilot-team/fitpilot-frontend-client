@@ -148,10 +148,12 @@ export const OnboardingPage = () => {
       
       await submitOnboarding.mutateAsync(payload)
       
+      
       // Invalidate the 'me' query to fetch the updated status
       await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] })
       
-      alert(t('onboarding.complete')) 
+      // alert(t('onboarding.complete')) 
+      navigate({ to: '/dashboard' })
       // Navigation will be handled by the useEffect observing the user status
     } catch (error) {
       console.error('Error completing onboarding:', error)

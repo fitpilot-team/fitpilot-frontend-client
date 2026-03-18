@@ -1,75 +1,75 @@
 {
   "auth": {
     "header": {
-      "signIn": "Iniciar sesión",
+      "signIn": "Iniciar sesiÃƒÂ³n",
       "register": "Registrarse",
-      "dontHaveAccount": "¿No tienes una cuenta?",
-      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
-      "rememberPassword": "¿Recuerdas tu contraseña?"
+      "dontHaveAccount": "Ã‚Â¿No tienes una cuenta?",
+      "alreadyHaveAccount": "Ã‚Â¿Ya tienes una cuenta?",
+      "rememberPassword": "Ã‚Â¿Recuerdas tu contraseÃƒÂ±a?"
     },
     "hero": {
       "title_line1": "Tu",
-      "title_line2": "transformación",
+      "title_line2": "transformaciÃƒÂ³n",
       "title_line3": "comienza hoy",
-      "description": "Accede a tu plan de nutrición y rutina de entrenamiento personalizados para lograr tu mejor versión."
+      "description": "Accede a tu plan de nutriciÃƒÂ³n y rutina de entrenamiento personalizados para lograr tu mejor versiÃƒÂ³n."
     },
     "login": {
       "title": "Bienvenido de nuevo",
       "subtitle": "Ingresa tus credenciales para acceder a tu panel.",
-      "identifier": "Correo, Usuario o Teléfono",
+      "identifier": "Correo, Usuario o TelÃƒÂ©fono",
       "identifierPlaceholder": "correo@ejemplo.com, usuario o +1234567890",
-      "email": "Correo electrónico",
-      "password": "Contraseña",
-      "forgotPassword": "¿Olvidaste tu contraseña?",
-      "keepLoggedIn": "Mantener sesión iniciada",
-      "submit": "Iniciar sesión"
+      "email": "Correo electrÃƒÂ³nico",
+      "password": "ContraseÃƒÂ±a",
+      "forgotPassword": "Ã‚Â¿Olvidaste tu contraseÃƒÂ±a?",
+      "keepLoggedIn": "Mantener sesiÃƒÂ³n iniciada",
+      "submit": "Iniciar sesiÃƒÂ³n"
     },
     "register": {
       "title": "Crear Cuenta",
-      "subtitle": "Únete a FitPilot y comienza tu transformación hoy.",
+      "subtitle": "ÃƒÅ¡nete a FitPilot y comienza tu transformaciÃƒÂ³n hoy.",
       "firstName": "Nombre",
       "lastName": "Apellido",
-      "email": "Correo electrónico",
-      "password": "Contraseña",
+      "email": "Correo electrÃƒÂ³nico",
+      "password": "ContraseÃƒÂ±a",
       "submit": "Registrarse"
     },
     "registerLink": {
-      "verifying": "Verificando tu invitación...",
-      "invalidLink": "Enlace inválido",
-      "invalidLinkMessage": "Este enlace de invitación es inválido o ha expirado.",
-      "goToSignIn": "Ir a Iniciar Sesión",
-      "accountCreated": "¡Cuenta Creada!",
-      "successMessage": "Tu cuenta se ha configurado correctamente. Redirigiendo al inicio de sesión...",
-      "signInNow": "Iniciar Sesión Ahora",
+      "verifying": "Verificando tu invitaciÃƒÂ³n...",
+      "invalidLink": "Enlace invÃƒÂ¡lido",
+      "invalidLinkMessage": "Este enlace de invitaciÃƒÂ³n es invÃƒÂ¡lido o ha expirado.",
+      "goToSignIn": "Ir a Iniciar SesiÃƒÂ³n",
+      "accountCreated": "Ã‚Â¡Cuenta Creada!",
+      "successMessage": "Tu cuenta se ha configurado correctamente. Redirigiendo al inicio de sesiÃƒÂ³n...",
+      "signInNow": "Iniciar SesiÃƒÂ³n Ahora",
       "title": "Completar Registro",
       "subtitle": "Configura tu perfil para acceder a tu cuenta.",
       "firstName": "Nombre",
       "lastName": "Apellido",
-      "phoneNumber": "Número de teléfono",
+      "phoneNumber": "NÃƒÂºmero de telÃƒÂ©fono",
       "username": "Nombre de usuario",
-      "password": "Contraseña",
-      "confirmPassword": "Confirmar Contraseña",
+      "password": "ContraseÃƒÂ±a",
+      "confirmPassword": "Confirmar ContraseÃƒÂ±a",
       "creatingAccount": "Creando Cuenta...",
       "submit": "Completar Registro",
-      "passwordsDoNotMatch": "Las contraseñas no coinciden",
-      "registrationFailed": "El registro falló",
-      "errorTitle": "Error de Invitación",
-      "backToLogin": "Volver a Iniciar Sesión",
-      "tokenNotFound": "Invitación no encontrada.",
-      "invalidToken": "Enlace de invitación inválido o expirado.",
-      "usernameTaken": "El nombre de usuario ya está en uso",
+      "passwordsDoNotMatch": "Las contraseÃƒÂ±as no coinciden",
+      "registrationFailed": "El registro fallÃƒÂ³",
+      "errorTitle": "Error de InvitaciÃƒÂ³n",
+      "backToLogin": "Volver a Iniciar SesiÃƒÂ³n",
+      "tokenNotFound": "InvitaciÃƒÂ³n no encontrada.",
+      "invalidToken": "Enlace de invitaciÃƒÂ³n invÃƒÂ¡lido o expirado.",
+      "usernameTaken": "El nombre de usuario ya estÃƒÂ¡ en uso",
       "usernameAvailable": "Nombre de usuario disponible"
     },
     "forgotPassword": {
-      "title": "Restablecer Contraseña",
+      "title": "Restablecer ContraseÃƒÂ±a",
       "subtitle": "Ingresa tu correo para recibir un enlace de restablecimiento.",
-      "email": "Correo electrónico",
+      "email": "Correo electrÃƒÂ³nico",
       "submit": "Enviar Enlace",
       "checkEmail": "Revisa tu correo para el enlace de restablecimiento."
     },
     "footer": {
-      "terms": "Términos de servicio",
-      "privacy": "Política de privacidad",
+      "terms": "TÃƒÂ©rminos de servicio",
+      "privacy": "PolÃƒÂ­tica de privacidad",
       "support": "Soporte",
       "copyright": "FitPilot App"
     }
@@ -77,51 +77,59 @@
   "onboarding": {
     "step": "Paso {{current}} de {{total}}",
     "exit": "Salir",
-    "back": "Atrás",
+    "back": "AtrÃƒÂ¡s",
     "next": "Siguiente Paso",
     "complete": "Completar Registro",
     "settingUp": "Configurando tu perfil...",
     "settingUpDesc": "Por favor espera mientras personalizamos tu experiencia.",
     "goals": {
-      "title": "¿Cuáles son tus objetivos?",
+      "title": "Ã‚Â¿CuÃƒÂ¡les son tus objetivos?",
       "subtitle": "Selecciona todos los que apliquen"
     },
     "allergens": {
-      "title": "¿Tienes alguna alergia o intolerancia?",
+      "title": "Ã‚Â¿Tienes alguna alergia o intolerancia?",
       "subtitle": "Selecciona las que apliquen a ti",
       "searchPlaceholder": "Buscar alergias...",
       "noResults": "No se encontraron resultados para",
       "allergiesSection": "Alergias",
       "intolerancesSection": "Intolerancias"
     },
+    "personal": {
+      "title": "Datos personales",
+      "subtitle": "Confirma tu fecha de nacimiento",
+      "dateOfBirth": "Fecha de nacimiento",
+      "validationRequired": "La fecha de nacimiento es obligatoria",
+      "validationInvalid": "La fecha de nacimiento no es valida",
+      "validationFuture": "La fecha de nacimiento no puede ser futura"
+    },
     "metrics": {
       "title": "Medidas Actuales",
-      "subtitle": "Ayúdanos a personalizar tu plan",
+      "subtitle": "AyÃƒÂºdanos a personalizar tu plan",
       "weight": "Peso (kg)",
       "height": "Altura (cm)"
     },
     "preferences": {
       "title": "Preferencias de Alimentos",
-      "subtitle": "Cuéntanos qué te gusta y qué evitar",
+      "subtitle": "CuÃƒÂ©ntanos quÃƒÂ© te gusta y quÃƒÂ© evitar",
       "likesLabel": "Alimentos que te gustan (Presiona Enter para agregar)",
       "likesPlaceholder": "ej. Pollo, Arroz, Manzana",
       "dislikesLabel": "Alimentos que no te gustan (Presiona Enter para agregar)",
-      "dislikesPlaceholder": "ej. Brócoli, Pescado",
+      "dislikesPlaceholder": "ej. BrÃƒÂ³coli, Pescado",
       "next": "Siguiente",
-      "back": "Atrás"
+      "back": "AtrÃƒÂ¡s"
     },
     "medical": {
-      "title": "Detalles Médicos",
-      "subtitle": "Ayúdanos a entender tu historial de salud",
-      "conditionsLabel": "Condiciones Médicas",
-      "conditionsPlaceholder": "ej. Diabetes, Hipertensión...",
-      "surgeriesLabel": "Cirugías / Lesiones",
-      "surgeriesPlaceholder": "Agregar una cirugía o lesión",
+      "title": "Detalles MÃƒÂ©dicos",
+      "subtitle": "AyÃƒÂºdanos a entender tu historial de salud",
+      "conditionsLabel": "Condiciones MÃƒÂ©dicas",
+      "conditionsPlaceholder": "ej. Diabetes, HipertensiÃƒÂ³n...",
+      "surgeriesLabel": "CirugÃƒÂ­as / Lesiones",
+      "surgeriesPlaceholder": "Agregar una cirugÃƒÂ­a o lesiÃƒÂ³n",
       "addSurgery": "Agregar",
       "surgeryFields": {
         "bodyPart": "Parte del cuerpo",
         "bodyPartPlaceholder": "ej. Rodilla, Hombro",
-        "name": "Nombre de lesión/cirugía",
+        "name": "Nombre de lesiÃƒÂ³n/cirugÃƒÂ­a",
         "namePlaceholder": "ej. Rotura de menisco",
         "severity": "Severidad (1-5)",
         "status": "Estado",
@@ -134,13 +142,14 @@
         },
         "limitations": "Limitaciones",
         "limitationsPlaceholder": "ej. Evitar levantar peso",
-        "diagnosticDate": "Fecha Diagnóstico (Opcional)",
-        "recoveryDate": "Fecha Recuperación (Opcional)"
+        "diagnosticDate": "Fecha DiagnÃƒÂ³stico (Opcional)",
+        "recoveryDate": "Fecha RecuperaciÃƒÂ³n (Opcional)"
       },
       "notesLabel": "Notas Adicionales",
       "notesPlaceholder": "Cualquier otro detalle que debamos saber...",
       "complete": "Completar Registro",
-      "back": "Atrás"
+      "back": "AtrÃƒÂ¡s"
     }
   }
 }
+

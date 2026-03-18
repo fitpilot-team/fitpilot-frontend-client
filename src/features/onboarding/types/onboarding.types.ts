@@ -32,6 +32,7 @@ export interface Injury {
 export interface OnboardingPayload {
   user_id: number
   form_version: string
+  date_of_birth: string
   goals: Goal[]
   allergens: Allergen[]
   metrics: Metrics

@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { LogOut } from 'lucide-react'
-import { GoalSelection, AllergenSelection, MetricInput, PreferenceInput, MedicalDetailsInput } from '../components/OnboardingSteps'
+import { GoalSelection, AllergenSelection, PersonalInfoInput, MetricInput, PreferenceInput, MedicalDetailsInput } from '../components/OnboardingSteps'
 import { useAuth } from '@/features/auth/context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { LanguageToggle } from '@/components/common/LanguageToggle'
@@ -32,6 +32,7 @@ export const OnboardingPage = () => {
   const [formData, setFormData] = useState({
     goals: [],
     allergens: [],
+    date_of_birth: '',
     weight_kg: '',
     height_cm: '',
     dislikes: [],
@@ -53,13 +54,15 @@ export const OnboardingPage = () => {
   const step3Ref = useRef<HTMLDivElement>(null)
   const step4Ref = useRef<HTMLDivElement>(null)
   const step5Ref = useRef<HTMLDivElement>(null)
+  const step6Ref = useRef<HTMLDivElement>(null)
 
   const steps = [
     { id: 1, ref: step1Ref, Component: GoalSelection },
     { id: 2, ref: step2Ref, Component: AllergenSelection },
-    { id: 3, ref: step3Ref, Component: MetricInput },
-    { id: 4, ref: step4Ref, Component: PreferenceInput },
-    { id: 5, ref: step5Ref, Component: MedicalDetailsInput },
+    { id: 3, ref: step3Ref, Component: PersonalInfoInput },
+    { id: 4, ref: step4Ref, Component: MetricInput },
+    { id: 5, ref: step5Ref, Component: PreferenceInput },
+    { id: 6, ref: step6Ref, Component: MedicalDetailsInput },
   ]
 
   // Track active step for styling
@@ -100,7 +103,7 @@ export const OnboardingPage = () => {
   const handleNext = (stepData: any) => {
     updateFormData(stepData)
     const nextStep = step + 1
-    if (nextStep <= 5) {
+    if (nextStep <= steps.length) {
       setStep(nextStep)
       scrollToStep(nextStep)
     }
@@ -117,10 +120,32 @@ export const OnboardingPage = () => {
   const handleComplete = async (finalData: any) => {
     try {
       const allData = { ...formData, ...finalData }
+      const parsedDateOfBirth = new Date(`${allData.date_of_birth}T00:00:00`)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      let dateOfBirthError = ''
+      if (!allData.date_of_birth) {
+        dateOfBirthError = t('onboarding.personal.validationRequired')
+      } else if (Number.isNaN(parsedDateOfBirth.getTime())) {
+        dateOfBirthError = t('onboarding.personal.validationInvalid')
+      } else if (parsedDateOfBirth > today) {
+        dateOfBirthError = t('onboarding.personal.validationFuture')
+      }
+
+      if (dateOfBirthError) {
+        alert(dateOfBirthError)
+        const personalStep = steps.find((s) => s.Component === PersonalInfoInput)
+        if (personalStep) {
+          setStep(personalStep.id)
+          scrollToStep(personalStep.id)
+        }
+        return
+      }
       
       const payload: OnboardingPayload = {
         user_id: Number(user?.id),
         form_version: 'v1',
+        date_of_birth: allData.date_of_birth,
         goals: allData.goals,
         allergens: allData.allergens,
         metrics: {
@@ -196,7 +221,7 @@ export const OnboardingPage = () => {
           <div className="flex-none bg-white z-10 p-4 shadow-sm relative">
            <div className="max-w-md mx-auto relative">
               <div className="flex justify-between items-center mb-2">
-                 <span className="text-sm font-medium text-gray-500">{t('onboarding.step', { current: activeVisibleStep, total: 5 })}</span>
+                 <span className="text-sm font-medium text-gray-500">{t('onboarding.step', { current: activeVisibleStep, total: steps.length })}</span>
                  
                  <div className="flex items-center gap-3">
                     <button 
@@ -215,7 +240,7 @@ export const OnboardingPage = () => {
               <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-blue-600 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${(activeVisibleStep / 5) * 100}%` }}
+                  style={{ width: `${(activeVisibleStep / steps.length) * 100}%` }}
                 />
               </div>
            </div>

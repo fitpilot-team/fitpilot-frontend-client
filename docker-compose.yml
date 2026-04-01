@@ -1,0 +1,11 @@
+services:
+  frontend-client:
+    image: ${FRONTEND_CLIENT_IMAGE:-fitpilot-frontend-client:local}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/}
+    ports:
+      - "${FRONTEND_CLIENT_PORT:-4173}:80"
+    restart: unless-stopped

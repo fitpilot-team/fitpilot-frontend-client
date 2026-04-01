@@ -9,7 +9,7 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
 let refreshTokenPromise: Promise<string> | null = null
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/',
+  baseURL: import.meta.env.VITE_API_URL || 'https://nutrition-api.fitpilot.fit',
   timeout: 10000,
   withCredentials: true,
   headers: {

@@ -8,7 +8,7 @@ RUN npm ci
 
 FROM deps AS builder
 
-ARG VITE_API_URL=http://localhost:3000/
+ARG VITE_API_URL=https://nutrition-api.fitpilot.fit
 
 ENV VITE_API_URL=$VITE_API_URL
 

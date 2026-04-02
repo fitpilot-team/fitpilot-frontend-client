@@ -5,22 +5,31 @@ import { useTranslation } from 'react-i18next'
 import { useLoginMutation } from '../services/auth.queries'
 import { useAuth } from '../context/AuthContext'
 import { jwtDecode } from 'jwt-decode'
+import { TurnstileChallenge } from '../components/TurnstileChallenge'
 
 export function LoginPage() {
   const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [turnstileRenderKey, setTurnstileRenderKey] = useState(0)
   const navigate = useNavigate()
   const search: any = useSearch({ strict: false }) // Get search params safely
   const loginMutation = useLoginMutation()
   const { login } = useAuth()
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() ?? ''
+  const turnstileEnabled = Boolean(turnstileSiteKey)
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
       const formData = new FormData(e.currentTarget)
       const identifier = formData.get('identifier') as string
       const password = formData.get('password') as string
+
+      if (turnstileEnabled && !captchaToken) {
+          return
+      }
       
-      loginMutation.mutate({ identifier, password, app_type: 'CLIENT_APP' }, {
+      loginMutation.mutate({ identifier, password, app_type: 'CLIENT_APP', ...(captchaToken ? { captcha_token: captchaToken } : {}) }, {
           onSuccess: (data: any) => {
               const token = data.access_token || data.token
               
@@ -59,6 +68,10 @@ export function LoginPage() {
                   console.error('Failed to decode token:', error)
                   // Handle error, maybe show a toast
               }
+          },
+          onError: () => {
+              setCaptchaToken(null)
+              setTurnstileRenderKey((currentValue) => currentValue + 1)
           }
       })
   }
@@ -137,12 +150,31 @@ export function LoginPage() {
                     {t('auth.login.keepLoggedIn')}
                 </label>
             </div>
+
+            {turnstileEnabled && (
+              <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                <p className="text-sm font-medium text-slate-700">
+                  {t('auth.login.turnstile.label')}
+                </p>
+                <TurnstileChallenge
+                  key={turnstileRenderKey}
+                  loadErrorMessage={t('auth.login.turnstile.loadError')}
+                  onTokenChange={setCaptchaToken}
+                  siteKey={turnstileSiteKey}
+                />
+                {!captchaToken && (
+                  <p className="text-xs text-slate-500">
+                    {t('auth.login.turnstile.required')}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loginMutation.isPending}
+            disabled={loginMutation.isPending || (turnstileEnabled && !captchaToken)}
             className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-4 rounded-2xl transition-all duration-200 shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loginMutation.isPending ? 'Signing in...' : t('auth.login.submit')}

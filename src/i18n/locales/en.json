@@ -22,7 +22,12 @@
       "password": "Password",
       "forgotPassword": "Forgot your password?",
       "keepLoggedIn": "Keep me logged in",
-      "submit": "Sign In"
+      "submit": "Sign In",
+      "turnstile": {
+        "label": "Security verification",
+        "required": "Complete the security check to continue.",
+        "loadError": "The security check could not be loaded."
+      }
     },
     "register": {
       "title": "Create Account",

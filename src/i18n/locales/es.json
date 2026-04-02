@@ -22,7 +22,12 @@
       "password": "Contraseña",
       "forgotPassword": "¿Olvidaste tu contraseña?",
       "keepLoggedIn": "Mantener sesión iniciada",
-      "submit": "Iniciar sesión"
+      "submit": "Iniciar sesión",
+      "turnstile": {
+        "label": "Verificación de seguridad",
+        "required": "Completa la verificación de seguridad para continuar.",
+        "loadError": "No se pudo cargar la verificación de seguridad."
+      }
     },
     "register": {
       "title": "Crear Cuenta",

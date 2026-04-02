@@ -44,6 +44,7 @@ export interface LoginDto {
   identifier: string
   password?: string
   app_type?: string
+  captcha_token?: string
 }
 
 export interface AuthSession {

@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authService } from './auth.service'
-import type { CompleteRegistrationDto, LoginDto } from './auth.service'
+import type {
+  CheckPhoneAvailabilityDto,
+  CompleteRegistrationDto,
+  LoginDto,
+  SignupDto,
+} from './auth.service'
 
 export const authKeys = {
   all: ['auth'] as const,
@@ -34,6 +39,18 @@ export const useCheckUsernameAvailabilityMutation = () => {
 export const useLoginMutation = () => {
   return useMutation({
     mutationFn: (data: LoginDto) => authService.login(data),
+  })
+}
+
+export const useSignupMutation = () => {
+  return useMutation({
+    mutationFn: (data: SignupDto) => authService.signup(data),
+  })
+}
+
+export const useCheckPhoneAvailabilityMutation = () => {
+  return useMutation({
+    mutationFn: (data: CheckPhoneAvailabilityDto) => authService.checkPhoneAvailability(data),
   })
 }
 

@@ -34,9 +34,35 @@
       "subtitle": "Únete a FitPilot y comienza tu transformación hoy.",
       "firstName": "Nombre",
       "lastName": "Apellido",
+      "countryCodeLabel": "Código de país",
+      "countryCodePlaceholder": "Selecciona",
+      "countryCodeSearchPlaceholder": "Busca país, siglas o código",
+      "countryCodeNoResults": "No se encontraron países",
+      "phoneNumber": "Número de teléfono",
+      "phoneLabel": "Número de teléfono",
+      "phonePlaceholder": "8112345678 o +528112345678",
+      "phoneHint": "Escribe tu número local o pega uno con formato internacional.",
+      "phoneInvalid": "Ingresa un número válido. Puedes escribirlo local o pegarlo con prefijo internacional.",
+      "phoneAlreadyInUse": "Ese número ya está asociado a una cuenta. Inicia sesión o recupera el acceso.",
+      "phoneAvailability": {
+        "checking": "Revisando disponibilidad...",
+        "available": "Número disponible.",
+        "unavailable": "Ese número ya está asociado a una cuenta. Usa otro número.",
+        "error": "No se pudo verificar la disponibilidad. Intenta de nuevo."
+      },
       "email": "Correo electrónico",
       "password": "Contraseña",
-      "submit": "Registrarse"
+      "confirmPassword": "Confirmar contraseña",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+      "passwordMin": "La contraseña debe tener al menos 6 caracteres.",
+      "submit": "Registrarse",
+      "creatingAccount": "Creando cuenta...",
+      "submitFailed": "No se pudo crear la cuenta.",
+      "turnstile": {
+        "label": "Verificación de seguridad",
+        "required": "Completa la verificación de seguridad para continuar.",
+        "loadError": "No se pudo cargar la verificación de seguridad."
+      }
     },
     "registerLink": {
       "verifying": "Verificando tu invitación...",
@@ -44,7 +70,7 @@
       "invalidLinkMessage": "Este enlace de invitación es inválido o ha expirado.",
       "goToSignIn": "Ir a Iniciar Sesión",
       "accountCreated": "¡Cuenta Creada!",
-      "successMessage": "Tu cuenta se ha configurado correctamente. Redirigiendo al inicio de sesión...",
+      "successMessage": "Tu cuenta se ha configurado correctamente.",
       "signInNow": "Iniciar Sesión Ahora",
       "title": "Completar Registro",
       "subtitle": "Configura tu perfil para acceder a tu cuenta.",
@@ -58,12 +84,18 @@
       "submit": "Completar Registro",
       "passwordsDoNotMatch": "Las contraseñas no coinciden",
       "registrationFailed": "El registro falló",
+      "submitFailed": "No se pudo completar el registro.",
       "errorTitle": "Error de Invitación",
       "backToLogin": "Volver a Iniciar Sesión",
       "tokenNotFound": "Invitación no encontrada.",
       "invalidToken": "Enlace de invitación inválido o expirado.",
       "usernameTaken": "El nombre de usuario ya está en uso",
-      "usernameAvailable": "Nombre de usuario disponible"
+      "usernameAvailable": "Nombre de usuario disponible",
+      "turnstile": {
+        "label": "Verificación de seguridad",
+        "required": "Completa la verificación de seguridad para continuar.",
+        "loadError": "No se pudo cargar la verificación de seguridad."
+      }
     },
     "forgotPassword": {
       "title": "Restablecer Contraseña",

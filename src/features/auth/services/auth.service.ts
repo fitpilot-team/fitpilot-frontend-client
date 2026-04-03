@@ -38,6 +38,7 @@ export interface CompleteRegistrationDto {
   username?: string
   first_name?: string
   lastname?: string
+  captcha_token?: string
 }
 
 export interface LoginDto {
@@ -45,6 +46,34 @@ export interface LoginDto {
   password?: string
   app_type?: string
   captcha_token?: string
+}
+
+export interface SignupDto {
+  name: string
+  lastname: string
+  email?: string
+  password: string
+  role: string
+  phone_number: string
+  client_session_id?: string
+  phone_verification_proof?: string
+  captcha_token?: string
+}
+
+export interface CheckPhoneAvailabilityDto {
+  phone_number: string
+}
+
+export interface PhoneAvailabilityResponse {
+  isAvailable: boolean
+}
+
+export interface AuthResponse {
+  access_token?: string
+  refresh_token?: string
+  token?: string
+  message?: string
+  code?: string
 }
 
 export interface AuthSession {
@@ -62,13 +91,32 @@ export const authService = {
     const { data: responseData } = await api.post('/v1/auth/login', data)
     return responseData
   },
+  signup: async (data: SignupDto): Promise<AuthResponse> => {
+    const { data: responseData } = await api.post<AuthResponse>('/v1/auth/signup', data)
+    return responseData
+  },
+  checkPhoneAvailability: async (
+    data: CheckPhoneAvailabilityDto,
+  ): Promise<PhoneAvailabilityResponse> => {
+    const { data: responseData } = await api.post<PhoneAvailabilityResponse>(
+      '/v1/auth/check-phone-availability',
+      data,
+    )
+    return responseData
+  },
   verifyToken: async (token: string): Promise<VerifyTokenResponse> => {
     const { data } = await api.get<VerifyTokenResponse>(`/v1/user-activation-tokens/${token}`)
     return data
   },
 
-  completeRegistration: async (data: CompleteRegistrationDto, token: string) => {
-    const { data: responseData } = await api.post(`/v1/user-activation-tokens/${token}/activate`, data)
+  completeRegistration: async (
+    data: CompleteRegistrationDto,
+    token: string,
+  ): Promise<AuthResponse> => {
+    const { data: responseData } = await api.post<AuthResponse>(
+      `/v1/user-activation-tokens/${token}/activate`,
+      data,
+    )
     return responseData
   },
 

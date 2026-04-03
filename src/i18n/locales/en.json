@@ -34,9 +34,35 @@
       "subtitle": "Join FitPilot and start your transformation today.",
       "firstName": "First Name",
       "lastName": "Last Name",
+      "countryCodeLabel": "Country code",
+      "countryCodePlaceholder": "Select",
+      "countryCodeSearchPlaceholder": "Search country, abbreviation, or code",
+      "countryCodeNoResults": "No countries found",
+      "phoneNumber": "Phone Number",
+      "phoneLabel": "Phone Number",
+      "phonePlaceholder": "4155552671 or +14155552671",
+      "phoneHint": "Type your local number or paste one in international format.",
+      "phoneInvalid": "Enter a valid number. You can type it locally or paste it with an international prefix.",
+      "phoneAlreadyInUse": "This number is already associated with an account. Sign in or recover access.",
+      "phoneAvailability": {
+        "checking": "Checking availability...",
+        "available": "Number available.",
+        "unavailable": "This number is already associated with an account. Use a different number.",
+        "error": "Could not verify availability. Please try again."
+      },
       "email": "Email",
       "password": "Password",
-      "submit": "Sign up"
+      "confirmPassword": "Confirm Password",
+      "passwordsDoNotMatch": "Passwords do not match.",
+      "passwordMin": "Password must be at least 6 characters long.",
+      "submit": "Sign up",
+      "creatingAccount": "Creating account...",
+      "submitFailed": "Could not create the account.",
+      "turnstile": {
+        "label": "Security verification",
+        "required": "Complete the security check to continue.",
+        "loadError": "The security check could not be loaded."
+      }
     },
     "registerLink": {
       "verifying": "Verifying your invitation...",
@@ -44,7 +70,7 @@
       "invalidLinkMessage": "This invitation link is invalid or has expired.",
       "goToSignIn": "Go to Sign In",
       "accountCreated": "Account Created!",
-      "successMessage": "Your account has been successfully set up. Redirecting you to login...",
+      "successMessage": "Your account has been successfully set up.",
       "signInNow": "Sign In Now",
       "title": "Complete Registration",
       "subtitle": "Set up your profile to access your account.",
@@ -58,12 +84,18 @@
       "submit": "Complete Registration",
       "passwordsDoNotMatch": "Passwords don't match",
       "registrationFailed": "Registration failed",
+      "submitFailed": "Could not complete registration.",
       "errorTitle": "Invitation Error",
       "backToLogin": "Back to Sign In",
       "tokenNotFound": "Invitation not found.",
       "invalidToken": "Invalid or expired invitation link.",
       "usernameTaken": "Username is already taken",
-      "usernameAvailable": "Username is available"
+      "usernameAvailable": "Username is available",
+      "turnstile": {
+        "label": "Security verification",
+        "required": "Complete the security check to continue.",
+        "loadError": "The security check could not be loaded."
+      }
     },
     "forgotPassword": {
       "title": "Reset Password",

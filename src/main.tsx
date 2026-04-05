@@ -11,6 +11,7 @@ import { AuthProvider } from './features/auth/context/AuthContext'
 // Create a client
 const queryClient = new QueryClient()
 
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

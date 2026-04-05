@@ -14,10 +14,10 @@ services:
     networks:
       coolify:
         aliases:
-          - fitpilot-frontend
+          - fitpilot-client-frontend
       default:
         aliases:
-          - fitpilot-frontend
+          - fitpilot-client-frontend
 
 networks:
   coolify:
